@@ -2,7 +2,6 @@ import cv2
 img = cv2.imread('../1_3.png')
 
 MIN_AREA = 500  # Could be tuned
-MAX_AREA
 
 # Make all pixels that aren't pure white into black pixels
 ret, img2 = cv2.threshold(img, 254, 255, cv2.THRESH_TOZERO)
@@ -17,7 +16,7 @@ colors = [(0, 255, 0), (0, 255, 255), (255, 0, 0), (0, 0, 255), (255, 255, 0), (
 good_contours = []
 
 # Throw out contours that are too small
-for cnt in zipcontours:
+for cnt in contours:
     if cv2.contourArea(cnt) > MIN_AREA:
         good_contours.append(cnt)
 
