@@ -25,33 +25,99 @@ def compute_edges(img, delta = 3):
     doors, w, h = find_doors(img)
     contours = find_room_contours(MIN_AREA, MAX_AREA, default_filepath)
     edges = []
-    for door in doors:
+    '''for door in doors[0]:
+        # Find contour that the door is in
         initial_contour = -1
         for cnt in contours:
+            print(cv2.pointPolygonTest(cnt, door, True))
             if cv2.pointPolygonTest(cnt, door, False) < 0:
-                continue
+                # continue
+                pass
             else:
                 initial_contour = cnt
                 break
         if initial_contour == -1:
-            continue
-        pos = door
-        while pos[0] < door[0] + w:
-            for cnt in contours:
-                if cv2.pointPolygonTest(cnt, door, False) < 0:
-                    continue
-                else:
-                    current_contour = cnt
+            #continue
+            pass'''
+
+    door = doors[27]
+    ''''# Find contour that the door is in
+    print(door)
+    initial_contour = -1
+    for cnt in contours:
+        print(cnt)
+        print(cv2.pointPolygonTest(cnt, door, True))
+        if cv2.pointPolygonTest(cnt, door, False) < 0:
+            # continue
+            pass
+        else:
+            initial_contour = cnt
+            break
+
+    print("Initial contour:", initial_contour)'''
+
+    for door in doors:
+        find_contours_from_line(contours, edges, door, w, h, 'top', delta)
+        find_contours_from_line(contours, edges, door, w, h, 'bottom', delta)
+        find_contours_from_line(contours, edges, door, w, h, 'left', delta)
+        find_contours_from_line(contours, edges, door, w, h, 'right', delta)
+
+    return edges
+
+
+def find_contours_from_line(contours, edges, orig_pos, w, h, side, delta=3):
+    """"Iterate around the border of the door to find a new contour"""
+    pos = orig_pos
+    # Adjust starting point based on side we're iterating accross
+    if side == 'bottom':
+        pos = (pos[0], pos[1] + h)
+    elif side == 'right':
+        pos = (pos[0] + w, pos[1])
+    if not (side == 'bottom' or side == 'top' or side == 'left' or side == 'right'):
+        raise ValueError('"side" must be "top", "bottom", "left", or "right"')
+
+    last_contour = None
+    current_contour = None
+    # Iterate across top of bounding box of the door
+    testCondition = True
+    contour_assigned = False
+    while testCondition:
+        if side == 'top' or side == 'bottom':
+            testCondition = pos[0] < orig_pos[0] + w
+        else:
+            testCondition = pos[1] < orig_pos[1] + h
+        for cnt in contours:
+            if cv2.pointPolygonTest(cnt, pos, False) < 0:
+                continue
+            current_contour = cnt
+            contour_assigned = True
+
+            break
+
+        if (contour_assigned and last_contour is not None):
+            current_is_diff = False
+            for pt1, pt2 in zip(current_contour, last_contour):
+                if not(pt1[0][0] == pt2[0][0] and pt1[0][1] == pt2[0][1]):
+                    current_is_diff = True
                     break
-            if not (current_contour == initial_contour):
-                edges.append((current_contour, initial_contour))
+            if current_is_diff:
+                edges.append((get_contour_label(current_contour), get_contour_label(last_contour)))
+                break
+
+        # Increment position
+        if side == 'top' or side == 'bottom':
+            pos = (pos[0] + delta, pos[1])
+        else:
+            pos = (pos[0], pos[1] + delta)
+
+        last_contour = current_contour
 
 
 def compute_vertices(contours):
     """Create a dictionary with labels as keys and contours as values."""
     dict = {}
     for contour in contours:
-        key = str((hex(sum(contour.flatten()))))
+        key = get_contour_label(contour)
         dict[key] = contour
     return dict
 
@@ -61,7 +127,7 @@ def find_doors(img, draw=False):
     doors = []
     w, h = 0, 0
     for door_path in door_paths:
-        doors_i = match_template(img, door_path, DOOR_THRESHOLD, draw)
+        doors_i, w, h = match_template(img, door_path, DOOR_THRESHOLD, draw)
         for door_i in doors_i:
             doors.append(door_i)
     return doors, w, h
@@ -107,6 +173,9 @@ def find_stairs(img, min_distance, draw=False):
     return ret_stairs, w, h
 
 
+def get_contour_label(contour):
+    return str((hex(sum(contour.flatten()))))
+
 def match_template(img, template_path, threshold, draw=False):
     """Find an arbitrary image within another image any number of times."""
     temp = cv2.imread(template_path, 0)
@@ -128,22 +197,9 @@ def match_template(img, template_path, threshold, draw=False):
 
 
 if __name__ == "__main__":
-    min_area = int(input("Min area: "))
-    max_area = int(input("Max area: "))
-    path = input("Filepath: ")
-    contours = find_room_contours(min_area, max_area, path)
+    img = cv2.imread(default_filepath, 0)
+    edges = compute_edges(img, delta = 3)
+    print(edges)
 
-    # Array of colors to cycle through
-    colors = [(0, 255, 0), (0, 255, 255), (255, 0, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255)]
+    cv2.imwrite('out.png', img)
 
-    img = cv2.imread(path)
-
-    # Draw contours in different colors
-    for i in range(len(contours)):
-        cnt = contours[i]
-        img = cv2.drawContours(img, [cnt], -1, colors[i % len(colors)], 1)
-
-    # Show image
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
