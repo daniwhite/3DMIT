@@ -45,4 +45,19 @@ def mapPath(start, end, nodes = ["hall1", "hall2", "hall3", "hall4", "hall5", "h
     return (nx.shortest_path(G, start, end),
            nx.shortest_path_length(G, start, end))
 
-print(mapPath("101", "107"))
+def pathDirections(pathInfo):
+    (path, numRms) = pathInfo
+    
+    print('The path is of length', numRms)
+    for roomNum in range(len(path)):
+        if roomNum == 0:
+            print('Start at', path[roomNum])
+        elif roomNum == len(path)-1:
+            print('Arrive at', path[roomNum])
+        else:
+            print('Go to', path[roomNum])
+        
+    
+
+print(mapPath("101", "401"))
+pathDirections(mapPath("101", "401"))
