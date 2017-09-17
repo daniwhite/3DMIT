@@ -36,12 +36,11 @@ def compute_edges(img, delta = 3):
 
 
 def compute_vertices(contours):
-    """Create a dictionary with labels as keys and contours as values."""
-    dict = {}
+    """Create a dictionary with labels and as keys and contours as values."""
+    vertices = []
     for contour in contours:
-        key = get_contour_label(contour)
-        dict[key] = contour
-    return dict
+        vertices.append(get_contour_label(contour))
+    return vertices
 
 
 def find_contours_from_line(contours, edges, orig_pos, w, h, side, delta=3):
