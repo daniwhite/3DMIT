@@ -36,9 +36,9 @@ if __name__ == "__main__":
     # Draw contours in different colors
     for i in range(len(contours)):
         cnt = contours[i]
-        img2 = cv2.drawContours(img, [cnt], -1, colors[i % len(colors)], 1)
+        img = cv2.drawContours(img, [cnt], -1, colors[i % len(colors)], 1)
 
     # Show image
-    cv2.imshow('image', img2)
+    cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
