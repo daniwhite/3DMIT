@@ -27,4 +27,4 @@ def imageText(filename):
 
         counter += 1
 
-imageText('1_0')
+##imageText('1_0')
