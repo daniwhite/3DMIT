@@ -39,7 +39,8 @@ def mapPath(start, end, nodes = ["hall1", "hall2", "hall3", "hall4", "hall5", "h
     #print(G.nodes())
     #print(G.edges())
 
-    nx.draw(G)
+    #nx.draw(G)
+    nx.draw(G, node_size=80, with_labels=True)
     plt.show()
 
     return (nx.shortest_path(G, start, end),
