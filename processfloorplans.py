@@ -25,36 +25,6 @@ def compute_edges(img, delta = 3):
     doors, w, h = find_doors(img)
     contours = find_room_contours(MIN_AREA, MAX_AREA, default_filepath)
     edges = []
-    '''for door in doors[0]:
-        # Find contour that the door is in
-        initial_contour = -1
-        for cnt in contours:
-            print(cv2.pointPolygonTest(cnt, door, True))
-            if cv2.pointPolygonTest(cnt, door, False) < 0:
-                # continue
-                pass
-            else:
-                initial_contour = cnt
-                break
-        if initial_contour == -1:
-            #continue
-            pass'''
-
-    door = doors[27]
-    ''''# Find contour that the door is in
-    print(door)
-    initial_contour = -1
-    for cnt in contours:
-        print(cnt)
-        print(cv2.pointPolygonTest(cnt, door, True))
-        if cv2.pointPolygonTest(cnt, door, False) < 0:
-            # continue
-            pass
-        else:
-            initial_contour = cnt
-            break
-
-    print("Initial contour:", initial_contour)'''
 
     for door in doors:
         find_contours_from_line(contours, edges, door, w, h, 'top', delta)
@@ -65,10 +35,19 @@ def compute_edges(img, delta = 3):
     return edges
 
 
+def compute_vertices(contours):
+    """Create a dictionary with labels as keys and contours as values."""
+    dict = {}
+    for contour in contours:
+        key = get_contour_label(contour)
+        dict[key] = contour
+    return dict
+
+
 def find_contours_from_line(contours, edges, orig_pos, w, h, side, delta=3):
     """"Iterate around the border of the door to find a new contour"""
     pos = orig_pos
-    # Adjust starting point based on side we're iterating accross
+    # Adjust starting point based on side we're iterating across
     if side == 'bottom':
         pos = (pos[0], pos[1] + h)
     elif side == 'right':
@@ -76,24 +55,29 @@ def find_contours_from_line(contours, edges, orig_pos, w, h, side, delta=3):
     if not (side == 'bottom' or side == 'top' or side == 'left' or side == 'right'):
         raise ValueError('"side" must be "top", "bottom", "left", or "right"')
 
+    # Set up contour variables
     last_contour = None
     current_contour = None
-    # Iterate across top of bounding box of the door
+
+    # Set up loop bools
     testCondition = True
     contour_assigned = False
     while testCondition:
+        # Adjust test condition based on side
         if side == 'top' or side == 'bottom':
             testCondition = pos[0] < orig_pos[0] + w
         else:
             testCondition = pos[1] < orig_pos[1] + h
+
+        # Find contour of current position
         for cnt in contours:
             if cv2.pointPolygonTest(cnt, pos, False) < 0:
                 continue
             current_contour = cnt
             contour_assigned = True
-
             break
 
+        # If we found a contour and it's different from our last one, add a new edge
         if (contour_assigned and last_contour is not None):
             current_is_diff = False
             for pt1, pt2 in zip(current_contour, last_contour):
@@ -101,7 +85,9 @@ def find_contours_from_line(contours, edges, orig_pos, w, h, side, delta=3):
                     current_is_diff = True
                     break
             if current_is_diff:
-                edges.append((get_contour_label(current_contour), get_contour_label(last_contour)))
+                edge = (get_contour_label(current_contour), get_contour_label(last_contour))
+                if edge not in edges:
+                    edges.append(edge)
                 break
 
         # Increment position
@@ -111,15 +97,6 @@ def find_contours_from_line(contours, edges, orig_pos, w, h, side, delta=3):
             pos = (pos[0], pos[1] + delta)
 
         last_contour = current_contour
-
-
-def compute_vertices(contours):
-    """Create a dictionary with labels as keys and contours as values."""
-    dict = {}
-    for contour in contours:
-        key = get_contour_label(contour)
-        dict[key] = contour
-    return dict
 
 
 def find_doors(img, draw=False):
@@ -175,6 +152,7 @@ def find_stairs(img, min_distance, draw=False):
 
 def get_contour_label(contour):
     return str((hex(sum(contour.flatten()))))
+
 
 def match_template(img, template_path, threshold, draw=False):
     """Find an arbitrary image within another image any number of times."""
