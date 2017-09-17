@@ -1,4 +1,5 @@
 # import the necessary packages
+
 from PIL import Image
 from tesserocr import PyTessBaseAPI, RIL
 

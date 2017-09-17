@@ -38,4 +38,4 @@ def roomNumToXandY(filename):
 
 # Coordinate system for ImgDraw and the X Y coordinates uses top left as (0,0)!
 
-print(roomNumToXandY('/Users/jennahimawan/Desktop/1_0.png'))
+print(roomNumToXandY('/Users/jennahimawan/Desktop/1_0-005.png'))
