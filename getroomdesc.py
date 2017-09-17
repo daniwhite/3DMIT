@@ -33,6 +33,3 @@ def run():
         driver.back()
     del res['</pre><p><a']
     return res
-    
-
-run()
