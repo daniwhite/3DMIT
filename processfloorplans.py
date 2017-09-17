@@ -194,17 +194,31 @@ if __name__ == "__main__":
     colors = [(0, 255, 0), (0, 255, 255), (255, 0, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255)]
 
     img = cv2.imread(default_filepath, 0)
-    img2 = cv2.imread(default_filepath)
+    color_im = cv2.imread(default_filepath)
 
     contours = find_room_contours(img)
 
     # Draw contours in different colors
     for i in range(len(contours)):
          cnt = contours[i]
-         img2 = cv2.drawContours(img2, [cnt], -1, colors[i % len(colors)], 1)
+         color_im = cv2.drawContours(color_im, [cnt], -1, colors[i % len(colors)], 1)
 
     # Show image
-    cv2.imshow('image', img2)
+    cv2.imshow('rooms', color_im)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    doors_im = img.copy()
+    find_doors(doors_im, True)
+    # Show image
+    cv2.imshow('doors', doors_im)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    stairs_im = img.copy()
+    find_stairs(stairs_im, 500, True)
+    # Show image
+    cv2.imshow('stairs', stairs_im)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
