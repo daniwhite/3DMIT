@@ -115,7 +115,7 @@ def find_room_contours(img, min_area=MIN_AREA, max_area=MAX_AREA):
     # Make all pixels that aren't pure white into black pixels
     ret, img2 = cv2.threshold(img, 254, 255, cv2.THRESH_TOZERO)
     # Ensure the image is black and white for finding contours
-    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    #img2 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     img2, contours, hierarchy = cv2.findContours(img2, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
@@ -190,5 +190,21 @@ def write_svg(path, contours):
 
 
 if __name__ == "__main__":
-    pass
+    # Array of colors to cycle through
+    colors = [(0, 255, 0), (0, 255, 255), (255, 0, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255)]
+
+    img = cv2.imread(default_filepath, 0)
+    img2 = cv2.imread(default_filepath)
+
+    contours = find_room_contours(img)
+
+    # Draw contours in different colors
+    for i in range(len(contours)):
+         cnt = contours[i]
+         img2 = cv2.drawContours(img2, [cnt], -1, colors[i % len(colors)], 1)
+
+    # Show image
+    cv2.imshow('image', img2)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
