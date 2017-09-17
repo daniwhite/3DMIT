@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 def roomNumToXandY(filename):
     numbertodesc = getroomdesc.numberToDesc(filename)
     floorplan = readtext.readText(filename)
-    print(floorplan)
+##    print(floorplan)
     image = Image.open(filename)
     draw = ImageDraw.Draw(image)
     filename = filename.split('/')[-1]
@@ -34,8 +34,10 @@ def roomNumToXandY(filename):
             pass
     filename = filename.replace('.png', '')
     image.save(filename + 'withdots.png')
+    for item in res:
+        print(item + ': ' + str(res[item]))
     return res
 
 # Coordinate system for ImgDraw and the X Y coordinates uses top left as (0,0)!
 
-print(roomNumToXandY('/Users/jennahimawan/Desktop/1_0-005.png'))
+roomNumToXandY('/Users/jennahimawan/Desktop/1_0.png')
