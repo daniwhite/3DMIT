@@ -32,19 +32,25 @@ def match_template(img, template_path, threshold, draw=False):
         pts.append(pt)
         if draw:
             cv2.rectangle(img, pt, (pt[0]+w, pt[1]+h), (125, 125, 0), 2)
-    return pts
+    return pts, w, h
 
 
 def find_doors(img, draw=False):
     """Find the number of doors in a floorplan."""
+    doors = []
+    w, h = 0, 0
     for door_path in door_paths:
-        match_template(img, door_path, DOOR_THRESHOLD, draw)
+        doors_i = match_template(img, door_path, DOOR_THRESHOLD, draw)
+        for door_i in doors_i:
+            doors.append(door_i)
+    return doors, w, h
 
 
 def find_stairs(img, min_distance, draw=False):
     stairs = []
+    w, h = 0, 0
     for stair in stair_paths:
-        stairs_i = match_template(img, stair, STAIR_THRESHOLD, draw)
+        stairs_i, w, h = match_template(img, stair, STAIR_THRESHOLD, draw)
         for stair_i in stairs_i:
             stairs.append(stair_i)
 
@@ -56,12 +62,12 @@ def find_stairs(img, min_distance, draw=False):
                 break
         else:
             ret_stairs.append(stair)
-    return ret_stairs
+    return ret_stairs, w, h
 
 
 if __name__ == "__main__":
     img = cv2.imread(default_img_path, 0)
-    stairs = find_stairs(img, 50, False)
+    stairs, stair_w, stair_h = find_stairs(img, 50, False)
 
     for stair in stairs:
         cv2.rectangle(img, stair, (stair[0] + 2, stair[1] + 2), (125, 125, 0), 2)
