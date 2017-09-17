@@ -35,8 +35,10 @@ def compute_edges(img, delta = 3):
     return edges
 
 
-def compute_vertices(contours):
+def compute_vertices(img):
     """Create a dictionary with labels and as keys and contours as values."""
+    contours = find_room_contours(img)
+
     vertices = []
     for contour in contours:
         vertices.append(get_contour_label(contour))
