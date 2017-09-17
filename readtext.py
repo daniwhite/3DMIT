@@ -16,8 +16,11 @@ def readText(filename):
             ocrResult = api.GetUTF8Text()
             conf = api.MeanTextConf()
             if ocrResult != '':
-                res[ocrResult] = (box['x'] + box['w']/2, box['y'] + box['h']/2)
+##                res[ocrResult] = (box['x'] + box['w']/2, box['y'] + box['h']/2)
+                res[ocrResult] = (box['x'], box['y'])
     return res
+
+# Coordinate system says top left is (0, 0)
     
 
-print(readText('/Users/jennahimawan/Desktop/1_0.png'))
+##print(readText('/Users/jennahimawan/Desktop/1_0.png'))

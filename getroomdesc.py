@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import Select
 import time
 
 def numberToDesc(filename):
+    filename = filename.split('/')[-1]
     res = {}
     driver = webdriver.Chrome('/usr/local/bin/chromedriver')
     driver.get('https://floorplans.mit.edu/cgi-bin-db-mit/wdbmitscript.asp?Report=ibrl&Item=MIT')
@@ -32,4 +33,7 @@ def numberToDesc(filename):
         except KeyError:
             pass
     driver.close()
+##    print(res)
     return res
+
+##numberToDesc('/Users/jennahimawan/Desktop/1_0.png')
