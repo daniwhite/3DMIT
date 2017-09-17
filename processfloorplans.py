@@ -23,7 +23,7 @@ def compute_edges(img, delta = 3):
     :param delta: stepsize for iterating along door edge
     """
     doors, w, h = find_doors(img)
-    contours = find_room_contours(MIN_AREA, MAX_AREA, default_filepath)
+    contours = find_room_contours(img)
     edges = []
 
     for door in doors:
@@ -110,9 +110,8 @@ def find_doors(img, draw=False):
     return doors, w, h
 
 
-def find_room_contours(min_area=MIN_AREA, max_area=MAX_AREA, path=default_filepath):
+def find_room_contours(img, min_area=MIN_AREA, max_area=MAX_AREA):
     """Find contours of the room."""
-    img = cv2.imread(path)
 
     # Make all pixels that aren't pure white into black pixels
     ret, img2 = cv2.threshold(img, 254, 255, cv2.THRESH_TOZERO)
@@ -174,10 +173,23 @@ def match_template(img, template_path, threshold, draw=False):
     return pts, w, h
 
 
-if __name__ == "__main__":
-    img = cv2.imread(default_filepath, 0)
-    edges = compute_edges(img, delta = 3)
-    print(edges)
+def write_svg(path, contours):
+    x,y,w,h = cv2.boundingRect(cv2.convexHull(contours))
+    c = max(contours, key=cv2.contourArea) # max contour
+    f = open(path, 'w+')
+    f.write('<svg width="'+str(w)+'" height="'+str(h)+'" xmlns="http://www.w3.org/2000/svg">')
+    f.write('<path d="M')
 
-    cv2.imwrite('out.png', img)
+    for i in range(len(c)):
+        x, y = c[i][0]
+        print(x)
+        f.write(str(x)+  ' ' + str(y)+' ')
+
+    f.write('"/>')
+    f.write('</svg>')
+    f.close()
+
+
+if __name__ == "__main__":
+    pass
 
